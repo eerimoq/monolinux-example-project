@@ -3,7 +3,7 @@ dist: xenial
 language: c
 
 before_install:
-  - sudo apt-get install -y fakeroot flex bison libelf-dev gettext
+  - sudo apt-get install -y fakeroot flex bison libelf-dev gettext autoconf autogen
   - tar xf 3pp/x86_64-linux-musl-cross.tgz
   - source setup.sh
 
