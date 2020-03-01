@@ -1,4 +1,3 @@
 build/
 *.o
 x86_64-linux-musl-cross/
-x86_64-linux-musl-cross.tgz
