@@ -3,7 +3,7 @@
 Monolinux example project
 =========================
 
-An Monolinux example project.
+An `Monolinux`_ example project using QEMU.
 
 Build and run
 =============
@@ -52,3 +52,5 @@ Project files and folders.
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/monolinux-example-project.svg
 .. _buildstatus: https://travis-ci.org/eerimoq/monolinux-example-project
+
+.. _Monolinux: https://github.com/eerimoq/monolinux
