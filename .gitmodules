@@ -1,0 +1,36 @@
+[submodule "sources/bitstream"]
+	path = 3pp/bitstream
+	url = https://github.com/eerimoq/bitstream
+[submodule "sources/humanfriendly"]
+	path = 3pp/humanfriendly
+	url = https://github.com/eerimoq/humanfriendly
+[submodule "sources/async"]
+	path = 3pp/async
+	url = https://github.com/eerimoq/async
+[submodule "sources/detools"]
+	path = 3pp/detools
+	url = https://github.com/eerimoq/detools
+[submodule "monolinux-c-library"]
+	path = 3pp/monolinux-c-library
+	url = https://github.com/eerimoq/monolinux-c-library
+[submodule "mbedtls"]
+	path = 3pp/mbedtls
+	url = https://github.com/ARMmbed/mbedtls.git
+[submodule "sources/curl"]
+	path = 3pp/curl
+	url = https://github.com/curl/curl.git
+[submodule "sources/heatshrink"]
+	path = 3pp/heatshrink
+	url = https://github.com/atomicobject/heatshrink
+[submodule "sources/xz"]
+	path = 3pp/xz
+	url = https://git.tukaani.org/xz.git
+[submodule "sources/zlib"]
+	path = 3pp/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "sources/linux"]
+	path = 3pp/linux
+	url = https://github.com/gregkh/linux.git
+[submodule "monolinux"]
+	path = 3pp/monolinux
+	url = https://github.com/eerimoq/monolinux
