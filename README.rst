@@ -34,7 +34,7 @@ and run everything in QEMU.
    Hello world!
    ...
 
-Exit QEMU with Ctrl-A C and then q <Enter>.
+Exit QEMU with Ctrl-A X.
 
 File tree
 =========
