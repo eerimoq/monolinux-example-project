@@ -12,7 +12,7 @@ Install all prerequisites:
 
 .. code-block:: shell
 
-   $ sudo apt install curl qemu-system-x86 flex bison libelf-dev
+   $ sudo apt install curl qemu-system-x86 flex bison libelf-dev gettext
    $ tar xf 3pp/x86_64-linux-musl-cross.tgz
 
 Source the development environment setup script.
