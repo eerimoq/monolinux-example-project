@@ -1,42 +1,9 @@
 |buildstatus|_
 
-Monolinux
-=========
+Monolinux example project
+=========================
 
-An embedded Linux distro with a single statically linked executable,
-because smaller is better!
-
-Monolinux is primarily targeting the `C` programming language.
-
-Features:
-
-- Everything the `Linux kernel`_ provides.
-
-  - File systems.
-
-  - Networking.
-
-  - Device drivers.
-
-  - ...
-
-- Libraries to statically link with your application.
-
-  - `ml`_ (the Monolinux C library)
-
-  - `curl`_ (HTTP, FTP, ...)
-
-  - `mbedTLS`_ (TLS, SSL, crypto, ...)
-
-  - `zlib`_
-
-  - `xz`_ (LZMA)
-
-  - `detools`_ (delta encoding)
-
-ToDo:
-
-- ...
+An Monolinux example project.
 
 Build and run
 =============
@@ -72,12 +39,11 @@ Exit QEMU with Ctrl-A C and then q <Enter>.
 File tree
 =========
 
-This is the file tree of the Monolinux repository.
+Project files and folders.
 
 .. code-block:: text
 
-   monolinux/                   - this repository
-   ├── bin/                     - executables
+   monolinux-example-project/   - this repository
    ├── configs/                 - a few Linux kernel configs
    ├── examples/                - example applications
    ├── LICENSE                  - license
@@ -86,27 +52,11 @@ This is the file tree of the Monolinux repository.
    ├── ml/                      - the Monolinux C library
    └── setup.sh                 - development environment setup script
 
-User project file tree before build. These files are normally under
-version control.
-
-See `Monolinux Jiffy`_ for a real example project.
+And after build.
 
 .. code-block:: text
 
-   my-project/                  - my Monolinux project
-   ├── app/
-   │   ├── main.c               - application entry point
-   │   └── Makefile             - project makefile
-   ├── Makefile                 - top level makefile
-   ├── monolinux/               - Monolinux
-   ├── README.rst               - readme
-   └── setup.sh                 - environment setup script
-
-User project file tree after build.
-
-.. code-block:: text
-
-   my-project/
+   monolinux-example-project/
    ├── app/
    │   ├── build/                   - all build output
    │   │   ├── app                  - the one and only executable
@@ -130,75 +80,5 @@ User project file tree after build.
    ├── README.rst
    └── setup.sh
 
-Configuration
-=============
-
-In general, just modify any files in this repository to match your
-project's needs.
-
-There are a few environment variables exported in ``setup.sh``.
-
-Cross compilation
-=================
-
-See `Monolinux Jiffy`_ for an example project.
-
-Tips and tricks
-===============
-
-See ``man procfs`` for details of the following commands.
-
-.. code-block:: shell
-
-   $ cat /proc/devices
-   $ cat /proc/meminfo
-   $ cat /proc/modules
-   $ cat /proc/net/arp
-   $ cat /proc/net/dev
-   $ cat /proc/net/protocols
-   $ cat /proc/net/route
-   $ cat /proc/uptime
-   $ cat /proc/version
-
-Disk commands.
-
-.. code-block:: shell
-
-   $ ls /sys/block
-   $ mount /dev/sda1 /mnt/disk ext4
-   $ ls /mnt/disk
-   $ cat /mnt/disk/README
-
-Configuration.
-
-.. code-block:: shell
-
-   # DNS.
-   $ cat /etc/resolv.conf
-
-Device tree.
-
-.. code-block:: shell
-
-   $ cat /sys/firmware/devicetree/base/...
-
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/monolinux-example-project.svg
 .. _buildstatus: https://travis-ci.org/eerimoq/monolinux-example-project
-
-.. _Monolinux Jiffy: https://github.com/eerimoq/monolinux-jiffy
-
-.. _Linux kernel: https://www.kernel.org/
-
-.. _ml: https://github.com/eerimoq/monolinux-c-library
-
-.. _curl: https://curl.haxx.se/
-
-.. _OpenSSL: https://www.openssl.org/
-
-.. _mbedTLS: https://tls.mbed.org/
-
-.. _zlib: https://zlib.net/
-
-.. _xz: https://tukaani.org/xz/
-
-.. _detools: https://github.com/eerimoq/detools
