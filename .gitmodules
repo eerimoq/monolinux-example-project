@@ -28,9 +28,6 @@
 [submodule "sources/zlib"]
 	path = 3pp/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "sources/linux"]
-	path = 3pp/linux
-	url = https://github.com/gregkh/linux.git
 [submodule "monolinux"]
 	path = 3pp/monolinux
 	url = https://github.com/eerimoq/monolinux
