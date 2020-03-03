@@ -3,7 +3,7 @@
 Monolinux example project
 =========================
 
-An `Monolinux`_ example project using QEMU.
+A `Monolinux`_ example project using QEMU.
 
 Build and run
 =============
