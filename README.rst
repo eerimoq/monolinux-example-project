@@ -27,28 +27,9 @@ and run everything in QEMU.
 
 .. code-block:: shell
 
-   $ make -C examples/hello_world run
-   ...
-   Hello world!
-   Hello world!
-   Hello world!
-   ...
+   $ make -j4 run
 
 Exit QEMU with Ctrl-A X.
-
-File tree
-=========
-
-Project files and folders.
-
-.. code-block:: text
-
-   monolinux-example-project/   - this repository
-   ├── 3pp/                     - third party sources
-   ├── configs/                 - Linux kernel configuration
-   ├── examples/                - example applications
-   ├── LICENSE                  - license
-   └── setup.sh                 - development environment setup script
 
 .. |buildstatus| image:: https://travis-ci.org/eerimoq/monolinux-example-project.svg
 .. _buildstatus: https://travis-ci.org/eerimoq/monolinux-example-project
