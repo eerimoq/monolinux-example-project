@@ -336,6 +336,20 @@ static void log_object_test(void)
     printf("============== log object test end =============\n\n");
 }
 
+static void network_filter_test()
+{
+    /* Print default filter. */
+    ml_network_filter_ipv4_log("filter");
+
+    /* Drop all and print. */
+    ml_network_filter_ipv4_drop_all();
+    ml_network_filter_ipv4_log("filter");
+
+    /* Accept all and print. */
+    ml_network_filter_ipv4_accept_all();
+    ml_network_filter_ipv4_log("filter");
+}
+
 int main()
 {
     init();
@@ -361,6 +375,7 @@ int main()
     http_test();
     ntp_client_test();
     log_object_test();
+    network_filter_test();
 
     return (async_main());
 }
