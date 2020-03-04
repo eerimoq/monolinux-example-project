@@ -8,4 +8,4 @@ before_install:
   - source setup.sh
 
 script:
-  - make -C examples/everything -j $(cat /proc/cpuinfo | grep processor | wc -l) build
+  - make -j $(cat /proc/cpuinfo | grep processor | wc -l)
