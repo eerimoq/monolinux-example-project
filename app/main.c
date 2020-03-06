@@ -44,6 +44,7 @@
 #include <lzma.h>
 #include <detools.h>
 #include "async_main.h"
+#include "network_filter.h"
 #include "ml/ml.h"
 
 extern int command_lzma_compress(int argc, const char *argv[]);
@@ -341,8 +342,11 @@ static void network_filter_test()
     /* Print default filter. */
     ml_network_filter_ipv4_log("filter");
 
-    /* Drop all and print. */
-    ml_network_filter_ipv4_drop_all();
+    /* Drop http for 10 seconds. */
+    ml_info("Dropping HTTP for 10 seconds.");
+    network_filter_drop_http();
+    sleep(10);
+    ml_info("Accepting HTTP.");
     ml_network_filter_ipv4_log("filter");
 
     /* Accept all and print. */

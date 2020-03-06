@@ -1,6 +1,7 @@
 SRC += lzma.c
 SRC += async_main.c
 SRC += publisher.c
+SRC += network_filter.c
 INITRAMFS_FILES += build/linux/fs/ext4/ext4.ko
 INITRAMFS_FILES += build/linux/fs/jbd2/jbd2.ko
 INITRAMFS_FILES += build/linux/fs/mbcache.ko
