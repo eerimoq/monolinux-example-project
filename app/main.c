@@ -47,13 +47,18 @@
 #include "network_filter.h"
 #include "ml/ml.h"
 
+struct folder_t {
+    const char *path_p;
+    int mode;
+};
+
 extern int command_lzma_compress(int argc, const char *argv[]);
 
 static void insert_modules(void)
 {
     int res;
     int i;
-    const char *modules[] = {
+    static const char *modules[] = {
         "/root/jbd2.ko",
         "/root/mbcache.ko",
         "/root/ext4.ko"
@@ -138,24 +143,35 @@ static int command_http_get(int argc, const char *argv[])
     return (0);
 }
 
-static void init(void)
+static void create_folders(void)
 {
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    static const struct folder_t folders[] = {
+        { "/proc", 0644 },
+        { "/sys", 0444 },
+        { "/dev/mapper", 0644 },
+        { "/mnt", 0644 },
+        { "/mnt/disk1", 0644 },
+        { "/mnt/disk2", 0644 },
+        { "/etc", 0644 }
+    };
+    int i;
+    int res;
 
-    ml_init();
-    ml_shell_init();
-    ml_network_init();
-    ml_shell_register_command("lzmac",
-                              "LZMA compress.",
-                              command_lzma_compress);
-    ml_shell_register_command("http_get",
-                              "HTTP GET.",
-                              command_http_get);
-    ml_shell_start();
+    for (i = 0; i < membersof(folders); i++) {
+        res = mkdir(folders[i].path_p, folders[i].mode);
+
+        if (res != 0) {
+            ml_error("Failed to mount '%s'", folders[i].path_p);
+        }
+    }
+}
+
+static void create_files(void)
+{
+    FILE *file_p;
 
     ml_mount("none", "/proc", "proc", 0);
     ml_mount("none", "/sys", "sysfs", 0);
-    insert_modules();
 
     ml_mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
     ml_mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
@@ -178,6 +194,34 @@ static void init(void)
              "/mnt/disk2",
              "squashfs",
              MS_RDONLY);
+
+    file_p = fopen("/etc/resolv.conf", "w");
+
+    if (file_p != NULL) {
+        fwrite("nameserver 8.8.4.4\n", 19, 1, file_p);
+        fclose(file_p);
+    }
+}
+
+static void init(void)
+{
+    ml_init();
+
+    insert_modules();
+    create_folders();
+    create_files();
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    ml_shell_init();
+    ml_network_init();
+    ml_shell_register_command("lzmac",
+                              "LZMA compress.",
+                              command_lzma_compress);
+    ml_shell_register_command("http_get",
+                              "HTTP GET.",
+                              command_http_get);
+    ml_shell_start();
 }
 
 static void print_banner(void)
@@ -255,9 +299,9 @@ static void lzma_test(void)
 static void detools_test(void)
 {
     int res;
-    const char from[] = "/mnt/disk1/detools/v1.txt";
-    const char patch[] = "/mnt/disk1/detools/v1-v2.patch";
-    const char to[] = "/mnt/disk1/detools/v2.txt";
+    static const char from[] = "/mnt/disk1/detools/v1.txt";
+    static const char patch[] = "/mnt/disk1/detools/v1-v2.patch";
+    static const char to[] = "/mnt/disk1/detools/v2.txt";
 
     printf("============== detools test begin ==============\n");
     printf("Library version: %s\n", DETOOLS_VERSION);
