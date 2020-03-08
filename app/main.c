@@ -155,7 +155,6 @@ static void init(void)
 
     ml_mount("none", "/proc", "proc", 0);
     ml_mount("none", "/sys", "sysfs", 0);
-    ml_mount("none", "/sys/kernel/debug", "debugfs", 0);
     insert_modules();
 
     ml_mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
