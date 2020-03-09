@@ -383,19 +383,11 @@ static void log_object_test(void)
 
 static void network_filter_test()
 {
-    /* Print default filter. */
-    ml_network_filter_ipv4_log("filter");
-
-    /* Drop http for 10 seconds. */
     ml_info("Dropping HTTP for 10 seconds.");
     network_filter_drop_http();
     sleep(10);
     ml_info("Accepting HTTP.");
-    ml_network_filter_ipv4_log("filter");
-
-    /* Accept all and print. */
     ml_network_filter_ipv4_accept_all();
-    ml_network_filter_ipv4_log("filter");
 }
 
 int main()
