@@ -170,8 +170,8 @@ static void create_files(void)
 {
     FILE *file_p;
 
-    ml_mount("none", "/proc", "proc", 0);
-    ml_mount("none", "/sys", "sysfs", 0);
+    ml_mount("none", "/proc", "proc", 0, NULL);
+    ml_mount("none", "/sys", "sysfs", 0, NULL);
 
     ml_mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
     ml_mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
@@ -189,11 +189,12 @@ static void create_files(void)
         "af4f26725d8ce706744b54d313ba47ab3be890b76c592ede8aca52779f4e93c9",
         "7891234871263971625789623497586239875698273465987234658792364598");
 
-    ml_mount("/dev/sda1", "/mnt/disk1", "ext4", 0);
+    ml_mount("/dev/sda1", "/mnt/disk1", "ext4", 0, NULL);
     ml_mount("/dev/mapper/00000000-1111-2222-3333-444444444444",
              "/mnt/disk2",
              "squashfs",
-             MS_RDONLY);
+             MS_RDONLY,
+             NULL);
 
     file_p = fopen("/etc/resolv.conf", "w");
 
