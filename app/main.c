@@ -178,6 +178,7 @@ static void create_files(void)
     ml_mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
     ml_mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
     ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
+    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
 
     ml_device_mapper_verity_create(
         "erik",
