@@ -12,4 +12,4 @@ docker run \
     --volume="/etc/group:/etc/group:ro" \
     --volume="/etc/passwd:/etc/passwd:ro" \
     --volume="/etc/shadow:/etc/shadow:ro" \
-    monolinux-example-project bash -c "source setup.sh && bash"
+    eerimoq/monolinux-example-project:0.1 bash -c "source setup.sh && bash"
