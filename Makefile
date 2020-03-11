@@ -6,3 +6,6 @@ run:
 
 clean:
 	$(MAKE) -C app clean
+
+docker-image:
+	cd docker && docker build -t monolinux-example-project .
