@@ -23,6 +23,7 @@ RUN apt-get update && \
     autopoint \
     libtool \
     cpio \
-    bash-completion
+    bash-completion \
+    libncurses5-dev
 
 ENV HOSTNAME=monolinux-example-project
