@@ -178,6 +178,7 @@ static void create_files(void)
     ml_mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
     ml_mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
     ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
+    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
 
     ml_device_mapper_verity_create(
         "erik",
@@ -206,11 +207,10 @@ static void create_files(void)
 
 static void init(void)
 {
-    mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
-    ml_init();
     insert_modules();
     create_folders();
     create_files();
+    ml_init();
     curl_global_init(CURL_GLOBAL_DEFAULT);
     ml_shell_init();
     ml_network_init();
@@ -401,7 +401,10 @@ int main()
     rtc_test();
 
 # if 1
-    ml_network_interface_configure("eth0", "10.0.2.15", "255.255.255.0");
+    ml_network_interface_configure("eth0",
+                                   "10.0.2.15",
+                                   "255.255.255.0",
+                                   1500);
     ml_network_interface_add_route("eth0", "10.0.2.2");
 #else
     struct ml_dhcp_client_t dhcp_client;
