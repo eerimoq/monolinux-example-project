@@ -161,7 +161,7 @@ static void create_folders(void)
         res = mkdir(folders[i].path_p, folders[i].mode);
 
         if (res != 0) {
-            ml_error("Failed to mount '%s'", folders[i].path_p);
+            ml_error("Failed to create '%s'", folders[i].path_p);
         }
     }
 }
@@ -178,7 +178,6 @@ static void create_files(void)
     ml_mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
     ml_mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
     ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
-    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
 
     ml_device_mapper_verity_create(
         "erik",
@@ -207,14 +206,12 @@ static void create_files(void)
 
 static void init(void)
 {
+    mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
     ml_init();
-
     insert_modules();
     create_folders();
     create_files();
-
     curl_global_init(CURL_GLOBAL_DEFAULT);
-
     ml_shell_init();
     ml_network_init();
     ml_shell_register_command("lzmac",
