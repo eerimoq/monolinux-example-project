@@ -173,12 +173,14 @@ static void create_files(void)
     ml_mount("none", "/proc", "proc", 0, NULL);
     ml_mount("none", "/sys", "sysfs", 0, NULL);
 
+    ml_mknod("/dev/null", S_IFCHR | 0644, makedev(1, 3));
+    ml_mknod("/dev/zero", S_IFCHR | 0644, makedev(1, 5));
+    ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
+    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
     ml_mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
     ml_mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
     ml_mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
     ml_mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
-    ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
-    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
 
     ml_device_mapper_verity_create(
         "erik",
