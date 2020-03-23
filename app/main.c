@@ -374,7 +374,7 @@ static void log_object_test(void)
     struct ml_log_object_t log_object;
 
     printf("============= log object test begin ============\n");
-    ml_log_object_init(&log_object, "foo", ML_LOG_ALL);
+    ml_log_object_init(&log_object, "foo", ML_LOG_DEBUG);
     ml_log_object_print(&log_object, ML_LOG_EMERGENCY, "Emergency level!");
     ml_log_object_print(&log_object, ML_LOG_INFO, "Info level!");
     ml_log_object_print(&log_object, ML_LOG_DEBUG, "Debug level!");
@@ -411,7 +411,7 @@ int main()
 #else
     struct ml_dhcp_client_t dhcp_client;
 
-    ml_dhcp_client_init(&dhcp_client, "eth0", ML_LOG_UPTO(INFO));
+    ml_dhcp_client_init(&dhcp_client, "eth0", ML_LOG_INFO);
     ml_dhcp_client_start(&dhcp_client);
 #endif
 

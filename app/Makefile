@@ -19,6 +19,7 @@ PACKAGES += mbedtls
 PACKAGES += monolinux-c-library
 PACKAGES += bitstream
 PACKAGES += humanfriendly
+PACKAGES += dbg-macro
 
 .PHONY: default
 

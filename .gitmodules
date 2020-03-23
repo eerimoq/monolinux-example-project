@@ -31,3 +31,6 @@
 [submodule "monolinux"]
 	path = 3pp/monolinux
 	url = https://github.com/eerimoq/monolinux
+[submodule "3pp/dbg-macro"]
+	path = 3pp/dbg-macro
+	url = https://github.com/eerimoq/dbg-macro
