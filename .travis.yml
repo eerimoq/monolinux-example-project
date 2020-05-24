@@ -2,10 +2,6 @@ dist: xenial
 
 language: c
 
-before_install:
-  - sudo apt-get install -y fakeroot flex bison libelf-dev gettext autoconf autogen autopoint qemu-utils
-  - tar xf docker/x86_64-linux-musl-cross.tgz
-  - source setup.sh
-
 script:
   - ./rundocker.sh make -s -j $(nproc)
+  - ./rundocker.sh make -s test
