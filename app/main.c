@@ -173,14 +173,14 @@ static void create_files(void)
     ml_mount("none", "/proc", "proc", 0, NULL);
     ml_mount("none", "/sys", "sysfs", 0, NULL);
 
-    ml_mknod("/dev/null", S_IFCHR | 0644, makedev(1, 3));
-    ml_mknod("/dev/zero", S_IFCHR | 0644, makedev(1, 5));
-    ml_mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
-    ml_mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
-    ml_mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
-    ml_mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
-    ml_mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
-    ml_mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
+    mknod("/dev/null", S_IFCHR | 0644, makedev(1, 3));
+    mknod("/dev/zero", S_IFCHR | 0644, makedev(1, 5));
+    mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
+    mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
+    mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
+    mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
+    mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
+    mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
 
     ml_device_mapper_verity_create(
         "erik",
@@ -337,7 +337,7 @@ static void rtc_test(void)
     ml_print_file("/sys/class/rtc/rtc0/date");
     printf("RTC sysfs time: ");
     ml_print_file("/sys/class/rtc/rtc0/time");
-    ml_mknod("/dev/rtc0", S_IFCHR | 0666, makedev(254, 0));
+    mknod("/dev/rtc0", S_IFCHR | 0666, makedev(254, 0));
     ml_rtc_get_time("/dev/rtc0", &tm);
     printf("RTC date and time: %s", asctime(&tm));
     tm.tm_year++;
