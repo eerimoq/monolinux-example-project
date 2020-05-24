@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import asyncio
 import threading
 import sys
@@ -9,6 +10,8 @@ import socketserver
 import pexpect
 import mqttools
 
+
+LOGGER = logging.getLogger(__name__)
 
 STARTUP_OUTPUT = '''\
 ================= insmod begin =================
@@ -163,14 +166,37 @@ def exit_qemu(child):
         time.sleep(0.1)
 
 
+class Logger:
+
+    def __init__(self):
+        self._data = ''
+
+    def write(self, data):
+        line = ''
+
+        for char in self._data + data:
+            if char == '\n':
+                LOGGER.info('app: %s', line.strip('\r\n\v'))
+                line = ''
+            else:
+                line += char
+
+        self._data = line
+
+    def flush(self):
+        pass
+
+
 def main():
+    logging.basicConfig(level=logging.DEBUG)
+
     http_server = HttpServer()
     http_server.start()
     mqtt_broker = MqttBroker()
     mqtt_broker.start()
 
     child = pexpect.spawn('make -s run',
-                          logfile=sys.stdout,
+                          logfile=Logger(),
                           encoding='latin-1')
 
     expect_text(child, STARTUP_OUTPUT)
