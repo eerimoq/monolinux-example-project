@@ -2,14 +2,21 @@
 
 set -e
 
+if [ "$#" -eq 0 ] ; then
+    COMMAND="bash"
+else
+    COMMAND="bash -c \"$*\""
+fi
+
 docker run \
-    -it \
-    --rm \
-    --user $(id -u):$(id -g) \
-    --workdir=$PWD \
-    --net host \
-    --volume="/home/$USER:/home/$USER" \
-    --volume="/etc/group:/etc/group:ro" \
-    --volume="/etc/passwd:/etc/passwd:ro" \
-    --volume="/etc/shadow:/etc/shadow:ro" \
-    eerimoq/monolinux-example-project:0.2 bash -c "source setup.sh && bash"
+       --interactive \
+       --tty \
+       --rm \
+       --user $(id -u):$(id -g) \
+       --workdir=$PWD \
+       --net host \
+       --volume="/home/$USER:/home/$USER" \
+       --volume="/etc/group:/etc/group:ro" \
+       --volume="/etc/passwd:/etc/passwd:ro" \
+       --volume="/etc/shadow:/etc/shadow:ro" \
+       eerimoq/monolinux-example-project:0.3 bash -c "source setup.sh && $COMMAND"

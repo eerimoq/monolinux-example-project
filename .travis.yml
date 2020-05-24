@@ -8,4 +8,4 @@ before_install:
   - source setup.sh
 
 script:
-  - make -j $(cat /proc/cpuinfo | grep processor | wc -l)
+  - ./rundocker.sh make -s -j $(nproc)

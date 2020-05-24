@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,6 +14,7 @@ RUN apt-get update && \
     bison \
     bc \
     python3 \
+    python3-pip \
     git \
     gitk \
     libelf-dev \
@@ -25,5 +26,9 @@ RUN apt-get update && \
     cpio \
     bash-completion \
     libncurses5-dev
+
+RUN pip3 install \
+    pexpect \
+    mqttools
 
 ENV HOSTNAME=monolinux-example-project

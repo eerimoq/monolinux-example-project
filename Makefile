@@ -1,3 +1,5 @@
+.PHONY: test
+
 default:
 	$(MAKE) -C app
 
@@ -6,6 +8,9 @@ run:
 
 clean:
 	$(MAKE) -C app clean
+
+test:
+	python3 test/test.py
 
 docker-image:
 	cd docker && docker build -t monolinux-example-project .
