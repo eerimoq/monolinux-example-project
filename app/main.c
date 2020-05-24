@@ -362,7 +362,9 @@ static void ntp_client_test(void)
     printf("================ ntp client test begin ===============\n");
     res = ml_ntp_client_sync("0.se.pool.ntp.org");
 
-    if (res != 0) {
+    if (res == 0) {
+        printf("NTP client ok!\n");
+    } else {
         printf("NTP client failed!\n");
     }
 

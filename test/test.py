@@ -79,6 +79,7 @@ RTC date and time:
 ================= http test end ================
 
 ================ ntp client test begin ===============
+NTP client ok!
 ================= ntp client test end ================
 
 ============= log object test begin ============
@@ -146,6 +147,13 @@ tcp: Publishing 'count: 0' on 'async/hello'.
 tcp: Publishing 'count: 1' on 'async/hello'.
 '''
 
+DMESG_TEXT = '''\
+EMERGENCY foo Emergency level!
+INFO foo Info level!
+DEBUG foo Debug level!
+INFO default Dropping HTTP for 10 seconds.
+'''
+
 
 def exit_qemu(child):
     child.sendcontrol('a')
@@ -168,6 +176,8 @@ def main():
     expect_text(child, STARTUP_OUTPUT)
     https_get_example_com(child)
     expect_text(child, MQTT_OUTPUT)
+    child.sendline('dmesg')
+    expect_text(child, DMESG_TEXT)
     exit_qemu(child)
 
     print('Done!')
