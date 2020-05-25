@@ -385,11 +385,67 @@ static void log_object_test(void)
 
 static void network_filter_test()
 {
+    printf("============= network filter test begin ============\n");
     ml_info("Dropping HTTP for 10 seconds.");
     network_filter_drop_http();
     sleep(10);
     ml_info("Accepting HTTP.");
     ml_network_filter_ipv4_accept_all();
+    printf("============== network filter test end =============\n\n");
+}
+
+static void tcp_server_test()
+{
+    int listener;
+    int client;
+    struct sockaddr_in addr;
+    int res;
+
+    printf("============= TCP server test begin ============\n");
+
+    listener = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (listener == -1) {
+        perror("socket");
+        goto out;
+    }
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(15000);
+
+    res = bind(listener, (struct sockaddr*)&addr, sizeof(addr));
+
+    if (res == -1) {
+        perror("bind");
+        close(listener);
+        goto out;
+    }
+
+    res = listen(listener, 10);
+
+    if (res == -1) {
+        perror("listen");
+        close(listener);
+        goto out;
+    }
+
+    printf("Listening for clients on port 15000.\n");
+
+    client = accept(listener, (struct sockaddr*)NULL, NULL);
+
+    if (client == -1) {
+        perror("accept");
+    } else {
+        printf("Client accepted.\n");
+        close(client);
+    }
+
+    close(listener);
+
+ out:
+    printf("============= TCP server test end ============\n");
 }
 
 int main()
@@ -421,6 +477,7 @@ int main()
     ntp_client_test();
     log_object_test();
     network_filter_test();
+    tcp_server_test();
 
     return (async_main());
 }

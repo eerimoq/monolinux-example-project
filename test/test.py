@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import socket
 import logging
 import asyncio
 import threading
@@ -87,6 +88,12 @@ NTP client ok!
 
 ============= log object test begin ============
 ============== log object test end =============
+
+============= network filter test begin ============
+============== network filter test end =============
+
+============= TCP server test begin ============
+Listening for clients on port 15000.
 '''
 
 
@@ -124,6 +131,19 @@ class MqttBroker(threading.Thread):
     async def main(self):
         broker = mqttools.Broker('127.0.0.1', 1883)
         await broker.serve_forever()
+
+
+TCP_CONNECT_OUTPUT = '''\
+Client accepted.
+============= TCP server test end ============
+'''
+
+
+def tcp_connect(child):
+    sock = socket.socket()
+    sock.connect(('localhost', 15000))
+    sock.close()
+    expect_text(child, TCP_CONNECT_OUTPUT)
 
 
 HTTPS_OUTPUT = '''\
@@ -200,10 +220,11 @@ def main():
                           encoding='latin-1')
 
     expect_text(child, STARTUP_OUTPUT)
-    https_get_example_com(child)
+    tcp_connect(child)
     expect_text(child, MQTT_OUTPUT)
     child.sendline('dmesg')
     expect_text(child, DMESG_TEXT)
+    https_get_example_com(child)
     exit_qemu(child)
 
     print('Done!')
