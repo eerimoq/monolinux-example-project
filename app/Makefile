@@ -20,6 +20,8 @@ PACKAGES += monolinux-c-library
 PACKAGES += bitstream
 PACKAGES += humanfriendly
 PACKAGES += dbg-macro
+PACKAGES += pbtools
+PACKAGES += messi
 
 .PHONY: default
 
