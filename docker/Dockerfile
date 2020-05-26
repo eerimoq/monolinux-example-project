@@ -29,6 +29,8 @@ RUN apt-get update && \
 
 RUN pip3 install \
     pexpect \
-    mqttools
+    mqttools \
+    pbtools \
+    messi
 
 ENV HOSTNAME=monolinux-example-project
