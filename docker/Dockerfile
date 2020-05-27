@@ -31,6 +31,7 @@ RUN pip3 install \
     pexpect \
     mqttools \
     pbtools \
-    messi
+    messi \
+    systest
 
 ENV HOSTNAME=monolinux-example-project
