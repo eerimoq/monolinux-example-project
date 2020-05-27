@@ -29,7 +29,7 @@ RUN apt-get update && \
 
 RUN pip3 install \
     pexpect \
-    mqttools \
+    mqttools==0.36.0 \
     pbtools \
     messi \
     systest==5.7.0

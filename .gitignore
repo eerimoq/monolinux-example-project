@@ -3,3 +3,4 @@ app/build/
 x86_64-linux-musl-cross/
 /systest-*
 /Monolinux*
+logs

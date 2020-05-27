@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import socket
 import logging
 import asyncio
@@ -29,53 +30,6 @@ class HttpServer(threading.Thread):
     def run(self):
         with TCPServer(("", 8001), SimpleHTTPRequestHandler) as httpd:
             httpd.serve_forever()
-
-
-class MqttBroker(threading.Thread):
-
-    def __init__(self):
-        super().__init__()
-        self.daemon = True
-        self.loop = None
-        self.broker_task = None
-
-    def run(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
-        self.broker_task = self.loop.create_task(self.main())
-        self.loop.run_until_complete(self.broker_task)
-
-    def stop(self):
-        if self.loop is None:
-            return
-
-        asyncio.run_coroutine_threadsafe(self.cancel(), self.loop)
-
-        while self.loop.is_running():
-            time.sleep(0.1)
-
-    async def cancel(self):
-        LOGGER.info('Stopping the MQTT broker.')
-
-        if self.broker_task is not None:
-            self.broker_task.cancel()
-
-            try:
-                await self.broker_task
-            except (Exception, asyncio.CancelledError):
-                pass
-
-            self.broker_task = None
-
-    async def main(self):
-        LOGGER.info('Starting the MQTT broker.')
-
-        broker = mqttools.Broker('127.0.0.1', 1883)
-
-        try:
-            await broker.serve_forever()
-        except asyncio.CancelledError:
-            LOGGER.info('MQTT broker stopped.')
 
 
 def exit_qemu(child):
@@ -127,7 +81,7 @@ class TestCase(systest.TestCase):
 
     def start_mqtt_broker(self):
         if self.mqtt_broker is None:
-            self.mqtt_broker = MqttBroker()
+            self.mqtt_broker = mqttools.BrokerThread('127.0.0.1')
             self.mqtt_broker.start()
 
     def stop_mqtt_broker(self):
@@ -396,7 +350,11 @@ class RebootTest(TestCase):
 
 
 def main():
-    systest.configure_logging(console_log_level=logging.DEBUG)
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+
+    systest.configure_logging(filename='logs/test',
+                              console_log_level=logging.DEBUG)
 
     http_server = HttpServer()
     http_server.start()
