@@ -369,6 +369,32 @@ class MqttClientTest(TestCase):
         self.stop_mqtt_broker()
 
 
+class SuicideExitTest(TestCase):
+    """Exit the process, the init process, should restart the system.
+
+    """
+
+    def run(self):
+        self.send('suicide exit')
+        self.expect(
+            "Welcome to Monolinux!\n"
+            "\n"
+            "Uptime:")
+
+
+class RebootTest(TestCase):
+    """Reboot the system.
+
+    """
+
+    def run(self):
+        self.send('reboot')
+        self.expect(
+            "Welcome to Monolinux!\n"
+            "\n"
+            "Uptime:")
+
+
 def main():
     systest.configure_logging(console_log_level=logging.DEBUG)
 
@@ -394,7 +420,9 @@ def main():
         LogObjectTest(device),
         NetworkFilterTest(device),
         TcpServerTest(device),
-        MqttClientTest(device)
+        MqttClientTest(device),
+        SuicideExitTest(device),
+        RebootTest(device)
     )
 
     exit_qemu(device)
