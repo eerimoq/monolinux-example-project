@@ -349,13 +349,16 @@ class RebootTest(TestCase):
             "Uptime:")
 
 
+class ExitQemuTest(TestCase):
+    """Exit QEMU.
+
+    """
+
+    def run(self):
+        exit_qemu(self.device)
+
+
 def main():
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-
-    systest.configure_logging(filename='logs/test',
-                              console_log_level=logging.DEBUG)
-
     http_server = HttpServer()
     http_server.start()
 
@@ -363,29 +366,24 @@ def main():
                            logfile=Logger(),
                            encoding='latin-1')
 
-    sequencer = systest.Sequencer("Monolinux Example Project")
-
-    _, failed, _ = sequencer.run(
-        StartupTest(device),
-        DiskTest(device),
-        HeatshrinkTest(device),
-        LzmaTest(device),
-        DetoolsTest(device),
-        RtcTest(device),
-        HttpTest(device),
-        HttpsGetTest(device),
-        NtpClientTest(device),
-        LogObjectTest(device),
-        NetworkFilterTest(device),
-        TcpServerTest(device),
-        MqttClientTest(device),
-        SuicideExitTest(device),
-        RebootTest(device)
-    )
-
-    exit_qemu(device)
-    sequencer.report()
-    sys.exit(failed)
+    systest.main("Monolinux Example Project",
+                 StartupTest(device),
+                 DiskTest(device),
+                 HeatshrinkTest(device),
+                 LzmaTest(device),
+                 DetoolsTest(device),
+                 RtcTest(device),
+                 HttpTest(device),
+                 HttpsGetTest(device),
+                 NtpClientTest(device),
+                 LogObjectTest(device),
+                 NetworkFilterTest(device),
+                 TcpServerTest(device),
+                 MqttClientTest(device),
+                 SuicideExitTest(device),
+                 RebootTest(device),
+                 ExitQemuTest(device),
+                 console_log_level=logging.DEBUG)
 
 
 main()
