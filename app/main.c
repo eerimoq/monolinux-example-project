@@ -82,67 +82,6 @@ static void insert_modules(void)
     printf("=================== insmod end =================\n\n");
 }
 
-static size_t on_write(void *buf_p, size_t size, size_t nmemb, void *arg_p)
-{
-    (void)arg_p;
-
-    fwrite(buf_p, size, nmemb, stdout);
-
-    return (size * nmemb);
-}
-
-static void http_get(const char *url_p)
-{
-    CURL *curl_p;
-    long response_code;
-    int res;
-
-    printf(">>> HTTP GET %s. >>>\n", url_p);
-
-    curl_p = curl_easy_init();
-
-    if (curl_p) {
-        curl_easy_setopt(curl_p, CURLOPT_URL, url_p);
-        curl_easy_setopt(curl_p, CURLOPT_WRITEFUNCTION, on_write);
-
-        /* WARNING: Makes the connection insecure! */
-        curl_easy_setopt(curl_p, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_easy_setopt(curl_p, CURLOPT_SSL_VERIFYHOST, 0);
-
-        res = curl_easy_perform(curl_p);
-
-        if (res == CURLE_OK) {
-            curl_easy_getinfo(curl_p, CURLINFO_RESPONSE_CODE, &response_code);
-            printf("<<< HTTP GET response code %ld. <<<\n", response_code);
-        } else {
-            printf("<<< HTTP GET CURL error code %d: %s. <<<\n",
-                   res,
-                   curl_easy_strerror(res));
-        }
-
-        curl_easy_cleanup(curl_p);
-    }
-}
-
-static void http_get_main(void *arg_p)
-{
-    http_get(arg_p);
-    free(arg_p);
-}
-
-static int command_http_get(int argc, const char *argv[])
-{
-    if (argc != 2) {
-        printf("http_get <url>\n");
-
-        return (-1);
-    }
-
-    ml_spawn(http_get_main, strdup(argv[1]));
-
-    return (0);
-}
-
 static void create_folders(void)
 {
     static const struct folder_t folders[] = {
@@ -207,65 +146,79 @@ static void create_files(void)
     }
 }
 
-static void init(void)
+static size_t on_write(void *buf_p, size_t size, size_t nmemb, void *arg_p)
 {
-    insert_modules();
-    create_folders();
-    create_files();
-    ml_init();
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    ml_shell_init();
-    ml_network_init();
-    ml_shell_register_command("lzmac",
-                              "LZMA compress.",
-                              command_lzma_compress);
-    ml_shell_register_command("http_get",
-                              "HTTP GET.",
-                              command_http_get);
-    ml_shell_start();
+    (void)arg_p;
+
+    fwrite(buf_p, size, nmemb, stdout);
+
+    return (size * nmemb);
 }
 
-static void print_banner(void)
+static void http_get(const char *url_p)
 {
-    int fd;
-    char buf[128];
-    ssize_t size;
+    CURL *curl_p;
+    long response_code;
+    int res;
 
-    fd = open("/proc/uptime", O_RDONLY);
+    printf(">>> HTTP GET %s. >>>\n", url_p);
 
-    if (fd < 0) {
-        perror("error: ");
+    curl_p = curl_easy_init();
 
-        return;
+    if (curl_p) {
+        curl_easy_setopt(curl_p, CURLOPT_URL, url_p);
+        curl_easy_setopt(curl_p, CURLOPT_WRITEFUNCTION, on_write);
+        curl_easy_setopt(curl_p, CURLOPT_CONNECTTIMEOUT, 5);
+
+        /* WARNING: Makes the connection insecure! */
+        curl_easy_setopt(curl_p, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl_p, CURLOPT_SSL_VERIFYHOST, 0);
+
+        res = curl_easy_perform(curl_p);
+
+        if (res == CURLE_OK) {
+            curl_easy_getinfo(curl_p, CURLINFO_RESPONSE_CODE, &response_code);
+            printf("<<< HTTP GET response code %ld. <<<\n", response_code);
+        } else {
+            printf("<<< HTTP GET CURL error code %d: %s. <<<\n",
+                   res,
+                   curl_easy_strerror(res));
+        }
+
+        curl_easy_cleanup(curl_p);
     }
-
-    size = read(fd, &buf[0], sizeof(buf) - 1);
-
-    if (size >= 0) {
-        buf[size] = '\0';
-        strtok(&buf[0], " ");
-    } else {
-        strcpy(&buf[0], "-");
-    }
-
-    close(fd);
-
-    printf("Welcome to Monolinux!\n"
-           "\n"
-           "Uptime: %s\n"
-           "\n",
-           &buf[0]);
 }
 
-static void disk_test(void)
+static void http_get_main(void *arg_p)
+{
+    http_get(arg_p);
+    free(arg_p);
+}
+
+static int command_http_get(int argc, const char *argv[])
+{
+    if (argc != 2) {
+        printf("http_get <url>\n");
+
+        return (-1);
+    }
+
+    ml_spawn(http_get_main, strdup(argv[1]));
+
+    return (0);
+}
+
+static int command_test_disk()
 {
     printf("================ disk test begin ===============\n");
     ml_print_file_systems_space_usage();
     ml_print_file("/mnt/disk1/README");
     printf("================= disk test end ================\n\n");
+
+    return (0);
 }
 
-static void heatshrink_test(void)
+static int command_test_heatshrink()
 {
     printf("============= heatshrink test begin ============\n");
 
@@ -275,9 +228,11 @@ static void heatshrink_test(void)
     (void)heatshrink_decoder_alloc(512, 8, 4);
 
     printf("============= heatshrink test end ==============\n\n");
+
+    return (0);
 }
 
-static void lzma_test(void)
+static int command_test_lzma()
 {
     lzma_ret ret;
     lzma_stream stream;
@@ -295,9 +250,11 @@ static void lzma_test(void)
     }
 
     printf("================= lzma test end ================\n\n");
+
+    return (0);
 }
 
-static void detools_test(void)
+static int command_test_detools()
 {
     int res;
     static const char from[] = "/mnt/disk1/detools/v1.txt";
@@ -326,9 +283,11 @@ static void detools_test(void)
     }
 
     printf("=============== detools test end ===============\n\n");
+
+    return (0);
 }
 
-static void rtc_test(void)
+static int command_test_rtc()
 {
     struct tm tm;
 
@@ -345,17 +304,21 @@ static void rtc_test(void)
     ml_rtc_get_time("/dev/rtc0", &tm);
     printf("RTC date and time: %s", asctime(&tm));
     printf("================= RTC test end =================\n\n");
+
+    return (0);
 }
 
-static void http_test(void)
+static int command_test_http()
 {
     printf("================ http test begin ===============\n");
     http_get("http://10.0.2.2:8001/");
     http_get("https://10.0.2.2:4443/");
     printf("================= http test end ================\n\n");
+
+    return (0);
 }
 
-static void ntp_client_test(void)
+static int command_test_ntp_client()
 {
     int res;
 
@@ -369,9 +332,11 @@ static void ntp_client_test(void)
     }
 
     printf("================= ntp client test end ================\n\n");
+
+    return (0);
 }
 
-static void log_object_test(void)
+static int command_test_log_object()
 {
     struct ml_log_object_t log_object;
 
@@ -381,20 +346,26 @@ static void log_object_test(void)
     ml_log_object_print(&log_object, ML_LOG_INFO, "Info level!");
     ml_log_object_print(&log_object, ML_LOG_DEBUG, "Debug level!");
     printf("============== log object test end =============\n\n");
+
+    return (0);
 }
 
-static void network_filter_test()
+static int command_test_network_filter()
 {
     printf("============= network filter test begin ============\n");
-    ml_info("Dropping HTTP for 10 seconds.");
+    http_get("http://example.com");
+    printf("Dropping HTTP.\n");
     network_filter_drop_http();
-    sleep(10);
-    ml_info("Accepting HTTP.");
+    http_get("http://example.com");
     ml_network_filter_ipv4_accept_all();
+    printf("Accepting HTTP.\n");
+    http_get("http://example.com");
     printf("============== network filter test end =============\n\n");
+
+    return (0);
 }
 
-static void tcp_server_test()
+static int command_test_tcp_server()
 {
     int listener;
     int client;
@@ -446,6 +417,88 @@ static void tcp_server_test()
 
  out:
     printf("============= TCP server test end ============\n");
+
+    return (0);
+}
+
+static void init(void)
+{
+    insert_modules();
+    create_folders();
+    create_files();
+    ml_init();
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    ml_shell_init();
+    ml_network_init();
+    ml_shell_register_command("lzmac",
+                              "LZMA compress.",
+                              command_lzma_compress);
+    ml_shell_register_command("http_get",
+                              "HTTP GET.",
+                              command_http_get);
+    ml_shell_register_command("test_disk",
+                              "Test disk operations.",
+                              command_test_disk);
+    ml_shell_register_command("test_heatshrink",
+                              "Test the Heatshrink library.",
+                              command_test_heatshrink);
+    ml_shell_register_command("test_lzma",
+                              "The the LZMA library.",
+                              command_test_lzma);
+    ml_shell_register_command("test_detools",
+                              "Test the detools library.",
+                              command_test_detools);
+    ml_shell_register_command("test_rtc",
+                              "Test the RTC.",
+                              command_test_rtc);
+    ml_shell_register_command("test_http",
+                              "Test HTTP.",
+                              command_test_http);
+    ml_shell_register_command("test_ntp_client",
+                              "Test NTP time synch.",
+                              command_test_ntp_client);
+    ml_shell_register_command("test_log_object",
+                              "Test the log object module.",
+                              command_test_log_object);
+    ml_shell_register_command("test_network_filter",
+                              "The the network filter module.",
+                              command_test_network_filter);
+    ml_shell_register_command("test_tcp_server",
+                              "Test a TCP server.",
+                              command_test_tcp_server);
+    ml_shell_start();
+}
+
+static void print_banner(void)
+{
+    int fd;
+    char buf[128];
+    ssize_t size;
+
+    fd = open("/proc/uptime", O_RDONLY);
+
+    if (fd < 0) {
+        perror("error: ");
+
+        return;
+    }
+
+    size = read(fd, &buf[0], sizeof(buf) - 1);
+
+    if (size >= 0) {
+        buf[size] = '\0';
+        strtok(&buf[0], " ");
+    } else {
+        strcpy(&buf[0], "-");
+    }
+
+    close(fd);
+
+    printf("Welcome to Monolinux!\n"
+           "\n"
+           "Uptime: %s\n"
+           "\n",
+           &buf[0]);
 }
 
 int main()
@@ -453,12 +506,7 @@ int main()
     init();
 
     print_banner();
-    disk_test();
-    heatshrink_test();
-    lzma_test();
-    detools_test();
     ml_network_interface_up("eth0");
-    rtc_test();
 
 # if 1
     ml_network_interface_configure("eth0",
@@ -472,12 +520,6 @@ int main()
     ml_dhcp_client_init(&dhcp_client, "eth0", ML_LOG_INFO);
     ml_dhcp_client_start(&dhcp_client);
 #endif
-
-    http_test();
-    ntp_client_test();
-    log_object_test();
-    network_filter_test();
-    tcp_server_test();
 
     return (async_main());
 }
