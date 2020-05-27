@@ -340,7 +340,7 @@ class MqttClientTest(TestCase):
 
 
 def main():
-    systest.configure_logging()
+    systest.configure_logging(console_log_level=logging.DEBUG)
 
     http_server = HttpServer()
     http_server.start()
