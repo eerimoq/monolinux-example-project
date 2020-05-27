@@ -32,6 +32,6 @@ RUN pip3 install \
     mqttools \
     pbtools \
     messi \
-    systest
+    systest==5.7.0
 
 ENV HOSTNAME=monolinux-example-project
