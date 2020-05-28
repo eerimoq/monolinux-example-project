@@ -10,7 +10,7 @@ clean:
 	$(MAKE) -C app clean
 
 test:
-	python3 test/test.py
+	python3 test/test.py $(ARGS)
 
 docker-image:
 	cd docker && docker build -t monolinux-example-project .

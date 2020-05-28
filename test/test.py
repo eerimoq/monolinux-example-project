@@ -90,27 +90,6 @@ class TestCase(systest.TestCase):
             self.mqtt_broker = None
 
 
-class StartupTest(TestCase):
-    """Check startup output and that the shell is responsive.
-
-    """
-
-    def run(self):
-        self.expect(
-            "================= insmod begin =================\n"
-            "Successfully inserted '/root/jbd2.ko'.\n"
-            "Successfully inserted '/root/mbcache.ko'.\n"
-            "Successfully inserted '/root/ext4.ko'.\n"
-            "Loaded modules:\n"
-            "=================== insmod end =================\n"
-            "\n"
-            "Welcome to Monolinux!\n"
-            "\n"
-            "Uptime:")
-        self.send('')
-        self.expect_exact('\n$ ')
-
-
 class DiskTest(TestCase):
     """Test disk operations.
 
@@ -349,41 +328,37 @@ class RebootTest(TestCase):
             "Uptime:")
 
 
-class ExitQemuTest(TestCase):
-    """Exit QEMU.
-
-    """
-
-    def run(self):
-        exit_qemu(self.device)
-
-
 def main():
+    sequencer = systest.setup("Monolinux Example Project",
+                              console_log_level=logging.DEBUG)
+
     http_server = HttpServer()
     http_server.start()
 
     device = pexpect.spawn('make -s run',
                            logfile=Logger(),
                            encoding='latin-1')
+    device.expect_exact("Welcome to Monolinux!")
 
-    systest.main("Monolinux Example Project",
-                 StartupTest(device),
-                 DiskTest(device),
-                 HeatshrinkTest(device),
-                 LzmaTest(device),
-                 DetoolsTest(device),
-                 RtcTest(device),
-                 HttpTest(device),
-                 HttpsGetTest(device),
-                 NtpClientTest(device),
-                 LogObjectTest(device),
-                 NetworkFilterTest(device),
-                 TcpServerTest(device),
-                 MqttClientTest(device),
-                 SuicideExitTest(device),
-                 RebootTest(device),
-                 ExitQemuTest(device),
-                 console_log_level=logging.DEBUG)
+    sequencer.run(
+        DiskTest(device),
+        HeatshrinkTest(device),
+        LzmaTest(device),
+        DetoolsTest(device),
+        RtcTest(device),
+        HttpTest(device),
+        HttpsGetTest(device),
+        NtpClientTest(device),
+        LogObjectTest(device),
+        NetworkFilterTest(device),
+        TcpServerTest(device),
+        MqttClientTest(device),
+        SuicideExitTest(device),
+        RebootTest(device)
+    )
+
+    exit_qemu(device)
+    sequencer.report_and_exit()
 
 
 main()
