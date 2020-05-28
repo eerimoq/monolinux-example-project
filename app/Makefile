@@ -3,9 +3,13 @@ SRC += src/lzma.c
 SRC += src/async_main.c
 SRC += src/publisher.c
 SRC += src/network_filter.c
+SRC += src/chat.c
+SRC += src/chat_server.c
+SRC += src/chat_server_linux.c
 INITRAMFS_FILES += build/linux/fs/ext4/ext4.ko
 INITRAMFS_FILES += build/linux/fs/jbd2/jbd2.ko
 INITRAMFS_FILES += build/linux/fs/mbcache.ko
+QEMU_NETDEV = -netdev user,id=net0,hostfwd=tcp::6000-:6000,hostfwd=tcp::15000-:15000
 QEMU_DISKS += build/mldisk.img
 QEMU_DISKS += disk2/fs.img
 QEMU_DISKS += disk2/table.img

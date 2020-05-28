@@ -44,6 +44,7 @@
 #include <lzma.h>
 #include <detools.h>
 #include "async_main.h"
+#include "chat_server_linux.h"
 #include "network_filter.h"
 #include "ml/ml.h"
 
@@ -520,6 +521,8 @@ int main()
     ml_dhcp_client_init(&dhcp_client, "eth0", ML_LOG_INFO);
     ml_dhcp_client_start(&dhcp_client);
 #endif
+
+    chat_server_linux_create();
 
     return (async_main());
 }
