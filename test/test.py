@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-import os
 import socket
 import logging
-import asyncio
 import threading
-import sys
 import time
 from http.server import SimpleHTTPRequestHandler
 import socketserver
 import pexpect
 import mqttools
 import systest
+
 
 LOGGER = logging.getLogger(__name__)
 
