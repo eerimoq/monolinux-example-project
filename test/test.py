@@ -48,7 +48,9 @@ class Logger:
 
         for char in self._data + data:
             if char == '\n':
-                LOGGER.info('app: %s', line.strip('\r\n\v'))
+                line = line.strip('\r\n\v')
+                line = line.replace('\x1b', '')
+                LOGGER.info('app: %s', line)
                 line = ''
             else:
                 line += char
@@ -335,7 +337,8 @@ def main():
 
     device = pexpect.spawn('make -s run',
                            logfile=Logger(),
-                           encoding='latin-1')
+                           encoding='utf-8',
+                           codec_errors='replace')
     device.expect_exact("Welcome to Monolinux!")
 
     sequencer.run(
