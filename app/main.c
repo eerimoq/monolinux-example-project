@@ -106,21 +106,48 @@ static void create_folders(void)
     }
 }
 
+static void pmount(const char *source_p,
+                   const char *target_p,
+                   const char *type_p,
+                   unsigned long flags,
+                   const char *options_p)
+{
+    int res;
+
+    res = mount(source_p, target_p, type_p, flags, options_p);
+
+    if (res != 0) {
+        printf("Mount of %s failed with %s.\n", target_p, strerror(-res));
+    }
+}
+
+static void pmknod(const char *path_p, mode_t mode, dev_t dev)
+{
+    int res;
+
+    res = mknod(path_p, mode, dev);
+
+    if (res != 0) {
+        printf("Mknod of %s failed with %s.\n", path_p, strerror(-res));
+    }
+}
+
 static void create_files(void)
 {
     FILE *file_p;
+    int res;
 
-    ml_mount("none", "/proc", "proc", 0, NULL);
-    ml_mount("none", "/sys", "sysfs", 0, NULL);
+    pmount("none", "/proc", "proc", 0, NULL);
+    pmount("none", "/sys", "sysfs", 0, NULL);
 
-    mknod("/dev/null", S_IFCHR | 0644, makedev(1, 3));
-    mknod("/dev/zero", S_IFCHR | 0644, makedev(1, 5));
-    mknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
-    mknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
-    mknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
-    mknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
-    mknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
-    mknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
+    pmknod("/dev/null", S_IFCHR | 0644, makedev(1, 3));
+    pmknod("/dev/zero", S_IFCHR | 0644, makedev(1, 5));
+    pmknod("/dev/urandom", S_IFCHR | 0644, makedev(1, 9));
+    pmknod("/dev/kmsg", S_IFCHR | 0644, makedev(1, 11));
+    pmknod("/dev/sda1", S_IFBLK | 0666, makedev(8, 1));
+    pmknod("/dev/sdb1", S_IFBLK | 0666, makedev(8, 16));
+    pmknod("/dev/sdc1", S_IFBLK | 0666, makedev(8, 32));
+    pmknod("/dev/mapper/control", S_IFCHR | 0666, makedev(10, 236));
 
     ml_device_mapper_verity_create(
         "erik",
@@ -132,12 +159,12 @@ static void create_files(void)
         "af4f26725d8ce706744b54d313ba47ab3be890b76c592ede8aca52779f4e93c9",
         "7891234871263971625789623497586239875698273465987234658792364598");
 
-    ml_mount("/dev/sda1", "/mnt/disk1", "ext4", 0, NULL);
-    ml_mount("/dev/mapper/00000000-1111-2222-3333-444444444444",
-             "/mnt/disk2",
-             "squashfs",
-             MS_RDONLY,
-             NULL);
+    pmount("/dev/sda1", "/mnt/disk1", "ext4", 0, NULL);
+    pmount("/dev/mapper/00000000-1111-2222-3333-444444444444",
+           "/mnt/disk2",
+           "squashfs",
+           MS_RDONLY,
+           NULL);
 
     file_p = fopen("/etc/resolv.conf", "w");
 
@@ -297,7 +324,7 @@ static int command_test_rtc()
     ml_print_file("/sys/class/rtc/rtc0/date");
     printf("RTC sysfs time: ");
     ml_print_file("/sys/class/rtc/rtc0/time");
-    mknod("/dev/rtc0", S_IFCHR | 0666, makedev(254, 0));
+    pmknod("/dev/rtc0", S_IFCHR | 0666, makedev(254, 0));
     ml_rtc_get_time("/dev/rtc0", &tm);
     printf("RTC date and time: %s", asctime(&tm));
     tm.tm_year++;
