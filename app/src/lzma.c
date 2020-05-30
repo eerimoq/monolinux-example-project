@@ -21,9 +21,10 @@
 #include <errno.h>
 #include <lzma.h>
 
-static void show_usage(const char *argv0)
+static void show_usage(const char *argv0, FILE *fout_p)
 {
-    fprintf(stderr, "Usage: %s PRESET DATA\n"
+    fprintf(fout_p,
+            "Usage: %s PRESET DATA\n"
             "PRESET is a number 0-9 and can optionally be "
             "followed by `e' to indicate extreme preset\n",
             argv0);
@@ -32,11 +33,12 @@ static void show_usage(const char *argv0)
 static bool get_args(int argc,
                      char **argv,
                      uint32_t *preset_p,
-                     const char **data_pp)
+                     const char **data_pp,
+                     FILE *fout_p)
 {
     // One argument whose first char must be 0-9.
     if (argc != 3 || argv[1][0] < '0' || argv[1][0] > '9') {
-        show_usage(argv[0]);
+        show_usage(argv[0], fout_p);
         return (false);
     }
 
@@ -48,7 +50,7 @@ static bool get_args(int argc,
     // the LZMA_PRESET_EXTREME flag.
     if (argv[1][1] != '\0') {
         if (argv[1][1] != 'e' || argv[1][2] != '\0') {
-            show_usage(argv[0]);
+            show_usage(argv[0], fout_p);
             return (false);
         }
 
@@ -59,7 +61,7 @@ static bool get_args(int argc,
 }
 
 static bool
-init_encoder(lzma_stream *strm, uint32_t preset)
+init_encoder(lzma_stream *strm, uint32_t preset, FILE *fout_p)
 {
     // Initialize the encoder using a preset. Set the integrity to check
     // to CRC64, which is the default in the xz command line tool. If
@@ -100,14 +102,17 @@ init_encoder(lzma_stream *strm, uint32_t preset)
         break;
     }
 
-    fprintf(stderr, "Error initializing the encoder: %s (error code %u)\n",
-            msg, ret);
+    fprintf(fout_p,
+            "Error initializing the encoder: %s (error code %u)\n",
+            msg,
+            ret);
+
     return false;
 }
 
 
 static bool
-compress(lzma_stream *strm, const char *data_p)
+compress(lzma_stream *strm, const char *data_p, FILE *fout_p)
 {
     // This will be LZMA_RUN until the end of the input file is reached.
     // This tells lzma_code() when there will be no more input.
@@ -185,10 +190,10 @@ compress(lzma_stream *strm, const char *data_p)
             int i;
 
             for (i = 0; i < write_size; i++) {
-                printf("%02X", outbuf[i]);
+                fprintf(fout_p, "%02X", outbuf[i]);
             }
 
-            printf("\n");
+            fprintf(fout_p, "\n");
 
             // Reset next_out and avail_out.
             strm->next_out = outbuf;
@@ -252,21 +257,24 @@ compress(lzma_stream *strm, const char *data_p)
                 break;
             }
 
-            fprintf(stderr, "Encoder error: %s (error code %u)\n",
-                    msg, ret);
+            fprintf(fout_p,
+                    "Encoder error: %s (error code %u)\n",
+                    msg,
+                    ret);
+
             return false;
         }
     }
 }
 
 
-int command_lzma_compress(int argc, char **argv)
+int command_lzma_compress(int argc, char **argv, FILE *fout_p)
 {
     // Get the preset number from the command line.
     uint32_t preset;
     const char *data_p;
 
-    if (!get_args(argc, argv, &preset, &data_p)) {
+    if (!get_args(argc, argv, &preset, &data_p, fout_p)) {
         return (-1);
     }
 
@@ -279,9 +287,9 @@ int command_lzma_compress(int argc, char **argv)
 
     // Initialize the encoder. If it succeeds, compress from
     // stdin to stdout.
-    bool success = init_encoder(&strm, preset);
+    bool success = init_encoder(&strm, preset, fout_p);
     if (success)
-        success = compress(&strm, data_p);
+        success = compress(&strm, data_p, fout_p);
 
     // Free the memory allocated for the encoder. If we were encoding
     // multiple files, this would only need to be done after the last

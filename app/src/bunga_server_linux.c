@@ -31,6 +31,7 @@
 #include <pthread.h>
 #include <sys/epoll.h>
 #include "bunga_server.h"
+#include "ml/ml.h"
 
 static void on_client_connected(struct bunga_server_t *self_p,
                                 struct bunga_server_client_t *client_p)
@@ -56,21 +57,58 @@ static void on_execute_command_req(struct bunga_server_t *self_p,
 {
     (void)client_p;
 
+    int res;
     struct bunga_execute_command_rsp_t *response_p;
+    FILE *fout_p;
+    char *output_p;
+    size_t offset;
+    size_t size;
+    char saved;
+    size_t chunk_size;
 
-    response_p = bunga_server_init_execute_command_rsp(self_p);
-    response_p->kind = bunga_execute_command_rsp_kind_output_e;
-    response_p->output_p = "The output of '";
-    bunga_server_reply(self_p);
+    fout_p = open_memstream(&output_p, &size);
 
-    response_p = bunga_server_init_execute_command_rsp(self_p);
-    response_p->kind = bunga_execute_command_rsp_kind_output_e;
-    response_p->output_p = request_p->command_p;
-    bunga_server_reply(self_p);
+    if (fout_p == NULL) {
+        response_p = bunga_server_init_execute_command_rsp(self_p);
+        response_p->kind = bunga_execute_command_rsp_kind_error_e;
+        response_p->error_p = "Out of memory.\n";
+        bunga_server_reply(self_p);
 
+        return;
+    }
+
+    res = ml_shell_execute_command(request_p->command_p, fout_p);
+
+    /* Output. */
+    fclose(fout_p);
+    chunk_size = 96;
+
+    for (offset = 0; offset < size; offset += chunk_size) {
+        if ((size - offset) < 96) {
+            chunk_size = (size - offset);
+        }
+
+        saved = output_p[offset + chunk_size];
+        output_p[offset + chunk_size] = '\0';
+
+        response_p = bunga_server_init_execute_command_rsp(self_p);
+        response_p->kind = bunga_execute_command_rsp_kind_output_e;
+        response_p->output_p = &output_p[offset];
+        bunga_server_reply(self_p);
+
+        output_p[offset + chunk_size] = saved;
+    }
+
+    /* Command result. */
     response_p = bunga_server_init_execute_command_rsp(self_p);
-    response_p->kind = bunga_execute_command_rsp_kind_ok_e;
-    response_p->output_p = "' should go here.\n";
+
+    if (res == 0) {
+        response_p->kind = bunga_execute_command_rsp_kind_ok_e;
+    } else {
+        response_p->kind = bunga_execute_command_rsp_kind_error_e;
+        response_p->error_p = strerror(-res);
+    }
+
     bunga_server_reply(self_p);
 }
 

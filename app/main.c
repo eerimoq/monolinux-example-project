@@ -54,7 +54,7 @@ struct folder_t {
     int mode;
 };
 
-extern int command_lzma_compress(int argc, const char *argv[]);
+extern int command_lzma_compress(int argc, const char *argv[], FILE *fout_p);
 
 static void insert_modules(void)
 {
@@ -79,7 +79,7 @@ static void insert_modules(void)
     }
 
     printf("Loaded modules:\n");
-    ml_print_file("/proc/modules");
+    ml_print_file("/proc/modules", stdout);
 
     printf("=================== insmod end =================\n\n");
 }
@@ -184,13 +184,13 @@ static size_t on_write(void *buf_p, size_t size, size_t nmemb, void *arg_p)
     return (size * nmemb);
 }
 
-static void http_get(const char *url_p)
+static void http_get(const char *url_p, FILE *fout_p)
 {
     CURL *curl_p;
     long response_code;
     int res;
 
-    printf(">>> HTTP GET %s. >>>\n", url_p);
+    fprintf(fout_p, ">>> HTTP GET %s. >>>\n", url_p);
 
     curl_p = curl_easy_init();
 
@@ -207,9 +207,9 @@ static void http_get(const char *url_p)
 
         if (res == CURLE_OK) {
             curl_easy_getinfo(curl_p, CURLINFO_RESPONSE_CODE, &response_code);
-            printf("<<< HTTP GET response code %ld. <<<\n", response_code);
+            fprintf(fout_p, "<<< HTTP GET response code %ld. <<<\n", response_code);
         } else {
-            printf("<<< HTTP GET CURL error code %d: %s. <<<\n",
+            fprintf(fout_p, "<<< HTTP GET CURL error code %d: %s. <<<\n",
                    res,
                    curl_easy_strerror(res));
         }
@@ -218,190 +218,215 @@ static void http_get(const char *url_p)
     }
 }
 
-static void http_get_main(void *arg_p)
-{
-    http_get(arg_p);
-    free(arg_p);
-}
-
-static int command_http_get(int argc, const char *argv[])
+static int command_http_get(int argc, const char *argv[], FILE *fout_p)
 {
     if (argc != 2) {
-        printf("http_get <url>\n");
+        fprintf(fout_p, "http_get <url>\n");
 
         return (-1);
     }
 
-    ml_spawn(http_get_main, strdup(argv[1]));
+    http_get(argv[1], fout_p);
 
     return (0);
 }
 
-static int command_test_disk()
+static int command_test_disk(int argc, const char *argv[], FILE *fout_p)
 {
-    printf("================ disk test begin ===============\n");
-    ml_print_file_systems_space_usage();
-    ml_print_file("/mnt/disk1/README");
-    printf("================= disk test end ================\n\n");
+    (void)argc;
+    (void)argv;
+
+    fprintf(fout_p, "================ disk test begin ===============\n");
+    ml_print_file_systems_space_usage(fout_p);
+    ml_print_file("/mnt/disk1/README", fout_p);
+    fprintf(fout_p, "================= disk test end ================\n\n");
 
     return (0);
 }
 
-static int command_test_heatshrink()
+static int command_test_heatshrink(int argc, const char *argv[], FILE *fout_p)
 {
-    printf("============= heatshrink test begin ============\n");
+    (void)argc;
+    (void)argv;
 
-    printf("Heatshrink encode and decode.\n");
+    fprintf(fout_p,
+            "============= heatshrink test begin ============\n"
+            "Heatshrink encode and decode.\n");
 
     (void)heatshrink_encoder_alloc(8, 4);
     (void)heatshrink_decoder_alloc(512, 8, 4);
 
-    printf("============= heatshrink test end ==============\n\n");
+    fprintf(fout_p,
+            "============= heatshrink test end ==============\n\n");
 
     return (0);
 }
 
-static int command_test_lzma()
+static int command_test_lzma(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     lzma_ret ret;
     lzma_stream stream;
 
-    printf("================ lzma test begin ===============\n");
+    fprintf(fout_p, "================ lzma test begin ===============\n");
 
     memset(&stream, 0, sizeof(stream));
 
     ret = lzma_alone_decoder(&stream, UINT64_MAX);
 
     if (ret != LZMA_OK) {
-        printf("LZMA decoder init failed.\n");
+        fprintf(fout_p, "LZMA decoder init failed.\n");
     } else {
-        printf("LZMA decoder init successful.\n");
+        fprintf(fout_p, "LZMA decoder init successful.\n");
     }
 
-    printf("================= lzma test end ================\n\n");
+    fprintf(fout_p, "================= lzma test end ================\n\n");
 
     return (0);
 }
 
-static int command_test_detools()
+static int command_test_detools(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     int res;
     static const char from[] = "/mnt/disk1/detools/v1.txt";
     static const char patch[] = "/mnt/disk1/detools/v1-v2.patch";
     static const char to[] = "/mnt/disk1/detools/v2.txt";
 
-    printf("============== detools test begin ==============\n");
-    printf("Library version: %s\n", DETOOLS_VERSION);
-    printf("From:  %s\n", from);
-    printf("Patch: %s\n", patch);
-    printf("To:    %s\n", to);
+    fprintf(fout_p, "============== detools test begin ==============\n");
+    fprintf(fout_p, "Library version: %s\n", DETOOLS_VERSION);
+    fprintf(fout_p, "From:  %s\n", from);
+    fprintf(fout_p, "Patch: %s\n", patch);
+    fprintf(fout_p, "To:    %s\n", to);
 
     res = detools_apply_patch_filenames(from, patch, to);
 
     if (res >= 0) {
-        printf("Before patching:\n");
-        ml_print_file(from);
-        printf("After patching:\n");
-        ml_print_file(to);
-        printf("detools: OK!\n");
+        fprintf(fout_p, "Before patching:\n");
+        ml_print_file(from, fout_p);
+        fprintf(fout_p, "After patching:\n");
+        ml_print_file(to, fout_p);
+        fprintf(fout_p, "detools: OK!\n");
     } else {
         res *= -1;
-        printf("error: detools: %s (error code %d)\n",
+        fprintf(fout_p, "error: detools: %s (error code %d)\n",
                detools_error_as_string(res),
                res);
     }
 
-    printf("=============== detools test end ===============\n\n");
+    fprintf(fout_p, "=============== detools test end ===============\n\n");
 
     return (0);
 }
 
-static int command_test_rtc()
+static int command_test_rtc(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     struct tm tm;
 
-    printf("================ RTC test begin ================\n");
-    printf("RTC sysfs date: ");
-    ml_print_file("/sys/class/rtc/rtc0/date");
-    printf("RTC sysfs time: ");
-    ml_print_file("/sys/class/rtc/rtc0/time");
+    fprintf(fout_p, "================ RTC test begin ================\n");
+    fprintf(fout_p, "RTC sysfs date: ");
+    ml_print_file("/sys/class/rtc/rtc0/date", fout_p);
+    fprintf(fout_p, "RTC sysfs time: ");
+    ml_print_file("/sys/class/rtc/rtc0/time", fout_p);
     pmknod("/dev/rtc0", S_IFCHR | 0666, makedev(254, 0));
     ml_rtc_get_time("/dev/rtc0", &tm);
-    printf("RTC date and time: %s", asctime(&tm));
+    fprintf(fout_p, "RTC date and time: %s", asctime(&tm));
     tm.tm_year++;
     ml_rtc_set_time("/dev/rtc0", &tm);
     ml_rtc_get_time("/dev/rtc0", &tm);
-    printf("RTC date and time: %s", asctime(&tm));
-    printf("================= RTC test end =================\n\n");
+    fprintf(fout_p, "RTC date and time: %s", asctime(&tm));
+    fprintf(fout_p, "================= RTC test end =================\n\n");
 
     return (0);
 }
 
-static int command_test_http()
+static int command_test_http(int argc, const char *argv[], FILE *fout_p)
 {
-    printf("================ http test begin ===============\n");
-    http_get("http://10.0.2.2:8001/");
-    http_get("https://10.0.2.2:4443/");
-    printf("================= http test end ================\n\n");
+    (void)argc;
+    (void)argv;
+
+    fprintf(fout_p, "================ http test begin ===============\n");
+    http_get("http://10.0.2.2:8001/", fout_p);
+    http_get("https://10.0.2.2:4443/", fout_p);
+    fprintf(fout_p, "================= http test end ================\n\n");
 
     return (0);
 }
 
-static int command_test_ntp_client()
+static int command_test_ntp_client(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     int res;
 
-    printf("================ ntp client test begin ===============\n");
+    fprintf(fout_p, "================ ntp client test begin ===============\n");
     res = ml_ntp_client_sync("0.se.pool.ntp.org");
 
     if (res == 0) {
-        printf("NTP client ok!\n");
+        fprintf(fout_p, "NTP client ok!\n");
     } else {
-        printf("NTP client failed!\n");
+        fprintf(fout_p, "NTP client failed!\n");
     }
 
-    printf("================= ntp client test end ================\n\n");
+    fprintf(fout_p, "================= ntp client test end ================\n\n");
 
     return (0);
 }
 
-static int command_test_log_object()
+static int command_test_log_object(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     struct ml_log_object_t log_object;
 
-    printf("============= log object test begin ============\n");
+    fprintf(fout_p, "============= log object test begin ============\n");
     ml_log_object_init(&log_object, "foo", ML_LOG_DEBUG);
     ml_log_object_print(&log_object, ML_LOG_EMERGENCY, "Emergency level!");
     ml_log_object_print(&log_object, ML_LOG_INFO, "Info level!");
     ml_log_object_print(&log_object, ML_LOG_DEBUG, "Debug level!");
-    printf("============== log object test end =============\n\n");
+    fprintf(fout_p, "============== log object test end =============\n\n");
 
     return (0);
 }
 
-static int command_test_network_filter()
+static int command_test_network_filter(int argc, const char *argv[], FILE *fout_p)
 {
-    printf("============= network filter test begin ============\n");
-    http_get("http://example.com");
-    printf("Dropping HTTP.\n");
+    (void)argc;
+    (void)argv;
+
+    fprintf(fout_p, "============= network filter test begin ============\n");
+    http_get("http://example.com", fout_p);
+    fprintf(fout_p, "Dropping HTTP.\n");
     network_filter_drop_http();
-    http_get("http://example.com");
+    http_get("http://example.com", fout_p);
     ml_network_filter_ipv4_accept_all();
-    printf("Accepting HTTP.\n");
-    http_get("http://example.com");
-    printf("============== network filter test end =============\n\n");
+    fprintf(fout_p, "Accepting HTTP.\n");
+    http_get("http://example.com", fout_p);
+    fprintf(fout_p, "============== network filter test end =============\n\n");
 
     return (0);
 }
 
-static int command_test_tcp_server()
+static int command_test_tcp_server(int argc, const char *argv[], FILE *fout_p)
 {
+    (void)argc;
+    (void)argv;
+
     int listener;
     int client;
     struct sockaddr_in addr;
     int res;
 
-    printf("============= TCP server test begin ============\n");
+    fprintf(fout_p, "============= TCP server test begin ============\n");
 
     listener = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -431,21 +456,21 @@ static int command_test_tcp_server()
         goto out;
     }
 
-    printf("Listening for clients on port 15000.\n");
+    fprintf(fout_p, "Listening for clients on port 15000.\n");
 
     client = accept(listener, (struct sockaddr*)NULL, NULL);
 
     if (client == -1) {
         perror("accept");
     } else {
-        printf("Client accepted.\n");
+        fprintf(fout_p, "Client accepted.\n");
         close(client);
     }
 
     close(listener);
 
  out:
-    printf("============= TCP server test end ============\n");
+    fprintf(fout_p, "============= TCP server test end ============\n");
 
     return (0);
 }
