@@ -75,10 +75,8 @@ static void on_message_ind(struct chat_server_t *self_p,
     chat_server_broadcast(self_p);
 }
 
-static void *main(void *arg_p)
+static void *main()
 {
-    (void)arg_p;
-
     struct chat_server_t server;
     struct chat_server_client_t clients[10];
     uint8_t clients_input_buffers[10][128];

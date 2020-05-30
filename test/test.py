@@ -332,6 +332,8 @@ def main():
     sequencer = systest.setup("Monolinux Example Project",
                               console_log_level=logging.DEBUG)
 
+    # logging.getLogger('mqttools.broker').setLevel(logging.INFO)
+
     http_server = HttpServer()
     http_server.start()
 
