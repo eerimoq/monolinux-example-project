@@ -175,15 +175,6 @@ static void create_files(void)
     }
 }
 
-static size_t on_write(void *buf_p, size_t size, size_t nmemb, void *arg_p)
-{
-    (void)arg_p;
-
-    fwrite(buf_p, size, nmemb, stdout);
-
-    return (size * nmemb);
-}
-
 static void http_get(const char *url_p, FILE *fout_p)
 {
     CURL *curl_p;
@@ -196,7 +187,7 @@ static void http_get(const char *url_p, FILE *fout_p)
 
     if (curl_p) {
         curl_easy_setopt(curl_p, CURLOPT_URL, url_p);
-        curl_easy_setopt(curl_p, CURLOPT_WRITEFUNCTION, on_write);
+        curl_easy_setopt(curl_p, CURLOPT_WRITEDATA, fout_p);
         curl_easy_setopt(curl_p, CURLOPT_CONNECTTIMEOUT, 5);
 
         /* WARNING: Makes the connection insecure! */
