@@ -40,3 +40,6 @@
 [submodule "3pp/messi"]
 	path = 3pp/messi
 	url = https://github.com/eerimoq/messi.git
+[submodule "3pp/bunga"]
+	path = 3pp/bunga
+	url = https://github.com/eerimoq/bunga.git
