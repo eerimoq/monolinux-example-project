@@ -105,9 +105,7 @@ static void on_execute_command_req(struct bunga_server_t *self_p,
 
 static void handle_execute_command_complete(struct execute_command_t *command_p)
 {
-    int res;
     struct bunga_execute_command_rsp_t *response_p;
-    FILE *fout_p;
     char *output_p;
     size_t offset;
     size_t size;
@@ -143,11 +141,11 @@ static void handle_execute_command_complete(struct execute_command_t *command_p)
     /* Command result. */
     response_p = bunga_server_init_execute_command_rsp(server_p);
 
-    if (res == 0) {
+    if (command_p->res == 0) {
         response_p->kind = bunga_execute_command_rsp_kind_ok_e;
     } else {
         response_p->kind = bunga_execute_command_rsp_kind_error_e;
-        response_p->error_p = strerror(-res);
+        response_p->error_p = strerror(-command_p->res);
     }
 
     bunga_server_send(server_p, client_p);
