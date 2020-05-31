@@ -29,10 +29,10 @@ RUN apt-get update && \
 
 RUN pip3 install \
     pexpect \
-    mqttools==0.36.0 \
+    mqttools==0.39.1 \
     pbtools \
     messi \
     systest==5.9.0 \
-    bunga==0.4.0
+    bunga==0.6.0
 
 ENV HOSTNAME=monolinux-example-project
