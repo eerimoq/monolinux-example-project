@@ -6,7 +6,6 @@ SRC += src/network_filter.c
 SRC += src/chat.c
 SRC += src/chat_server.c
 SRC += src/chat_server_linux.c
-SRC += src/bunga_server_linux.c
 INITRAMFS_FILES += build/linux/fs/ext4/ext4.ko
 INITRAMFS_FILES += build/linux/fs/jbd2/jbd2.ko
 INITRAMFS_FILES += build/linux/fs/mbcache.ko
