@@ -79,7 +79,7 @@ int async_main()
     async_ssl_module_init();
     async_init(&async);
     /* async_set_log_object_callbacks(&async, log_stdout, NULL); */
-    async_set_runtime(&async, async_runtime_monolinux_create());
+    async_set_runtime(&async, async_runtime_create());
     publisher_init(&publishers[0],
                    "tcp",
                    1883,
