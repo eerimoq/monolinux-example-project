@@ -100,7 +100,6 @@ class DiskTest(TestCase):
         self.expect(
             "================ disk test begin ===============\n"
             "MOUNTED ON               TOTAL      USED      FREE\n"
-            "/                        53 MB      2 MB     51 MB\n"
             "/proc                     0 MB      0 MB      0 MB\n"
             "/sys                      0 MB      0 MB      0 MB\n"
             "/mnt/disk1                7 MB      0 MB      7 MB\n"
