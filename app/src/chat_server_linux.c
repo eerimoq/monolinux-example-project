@@ -75,7 +75,7 @@ static void on_message_ind(struct chat_server_t *self_p,
     chat_server_broadcast(self_p);
 }
 
-static void *main()
+static void *chat_server_main()
 {
     struct chat_server_t server;
     struct chat_server_client_t clients[10];
@@ -86,7 +86,6 @@ static void *main()
     int epoll_fd;
     struct epoll_event event;
     int res;
-    const char *uri_p;
 
     printf("Starting a chat server on ':6000'.\n");
 
@@ -148,5 +147,5 @@ void chat_server_linux_create(void)
 {
     pthread_t pthread;
 
-    pthread_create(&pthread, NULL, main, NULL);
+    pthread_create(&pthread, NULL, chat_server_main, NULL);
 }

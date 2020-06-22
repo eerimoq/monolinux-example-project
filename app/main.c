@@ -136,7 +136,6 @@ static void pmknod(const char *path_p, mode_t mode, dev_t dev)
 static void create_files(void)
 {
     FILE *file_p;
-    int res;
 
     pmount("none", "/proc", "proc", 0, NULL);
     pmount("none", "/sys", "sysfs", 0, NULL);
