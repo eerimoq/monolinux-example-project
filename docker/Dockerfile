@@ -27,12 +27,15 @@ RUN apt-get update && \
     bash-completion \
     libncurses5-dev
 
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
 RUN pip3 install \
     pexpect \
     mqttools==0.39.1 \
     pbtools \
     messi \
     systest==5.9.0 \
-    bunga==0.6.0
+    bunga==0.42.0
 
 ENV HOSTNAME=monolinux-example-project
