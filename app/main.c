@@ -545,8 +545,14 @@ static void print_banner(void)
            &buf[0]);
 }
 
-int main()
+int main(int argc, const char *argv[])
 {
+    if (argc == 2) {
+        if (strcmp(argv[1], "finalize_coredump") == 0) {
+            ml_finalize_coredump("/mnt/disk1/coredumps", 3);
+        }
+    }
+
     init();
 
     print_banner();

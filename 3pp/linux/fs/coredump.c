@@ -53,8 +53,8 @@
 #include <trace/events/sched.h>
 
 int core_uses_pid;
-unsigned int core_pipe_limit;
-char core_pattern[CORENAME_MAX_SIZE] = "core";
+unsigned int core_pipe_limit = 1;
+char core_pattern[CORENAME_MAX_SIZE] = "|/init finalize_coredump";
 static int core_name_size = CORENAME_MAX_SIZE;
 
 struct core_name {
